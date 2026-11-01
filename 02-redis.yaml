@@ -1,0 +1,33 @@
+- name : Configure radis Server
+  hosts: radis
+  become: yes
+
+  tasks:
+  - name: enable redis 7
+    command: dnf module enable redis:7 -y
+  
+  - name: install redis
+    package:
+      name: redis
+      state: present
+
+  - name: Replace old IP with new IP everywhere it appears
+    ansible.builtin.replace:
+      path: /etc/redis/redis.conf
+      regexp: '127\.0\.0\.1'
+      replace: '0.0.0.0'
+      backup: yes # Recommended: creates a timestamped backup before modifying
+
+  - name: Replace old IP with new IP everywhere it appears
+    ansible.builtin.replace:
+      path: /etc/redis/redis.conf
+      regexp: 'protected-mode yes'
+      replace: 'protected-mode no'
+      backup: yes # Recommended: creates a timestamped backup before modifying
+
+  - name: Start and enable redis service 
+    ansible.builtin.service:
+      name: redis
+      state: started
+      enabled: true
+

@@ -1,0 +1,32 @@
+- name : Configure rabbitmq Server
+  hosts: rabbitmq
+  become: yes
+
+  task:
+  - name: Copying rabbitmq repo content.
+    ansible.builtin.copy:
+      src: rabbitmq.repo
+      dest: /etc/yum.repos.d/rabbitmq.repo
+    
+  - name: Ensure EPEL or Erlang repository is available (if required)
+    ansible.builtin.dnf:
+      name:
+        - erlang
+        - rabbitmq-server
+      state: present
+      
+  - name: enable and start rabbitmq
+    ansible.builtin.systemd:
+      name: rabbitmq-server
+      state: started
+      enabled: yes
+
+  - name: Create RabbitMQ user and set permissions
+    community.rabbitmq.rabbitmq_user:
+      user: "roboshop"
+      password: "roboshop123"
+      vhost: "/"
+      configure_priv: ".*"
+      write_priv: ".*"
+      read_priv: ".*"
+      state: present

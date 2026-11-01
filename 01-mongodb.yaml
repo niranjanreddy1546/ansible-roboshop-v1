@@ -1,0 +1,33 @@
+- name : Configure Mongodb Server
+  hosts: mongodb
+  become: yes
+
+  task:
+  - name: Copying mongo repo content.
+    ansible.builtin.copy:
+      src: mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo
+
+  - name: dnf install mongodb-org
+    ansible.builtin.dnf: 
+      name: mongodb-org
+      state: present
+  
+  - name: Start and enable the mongo service
+    ansible.builtin.service:
+      name: mongod
+      state: started
+      enabled: true
+  
+  - name: Replace old IP with new IP everywhere it appears
+    ansible.builtin.replace:
+      path: /etc/mongod.conf
+      regexp: '127\.0\.0\.1'
+      replace: '0.0.0.0'
+      backup: yes # Recommended: creates a timestamped backup before modifying
+
+  - name: Restart the mongod
+    ansible.builtin.service:
+      name: mongod
+      state: restarted
+
