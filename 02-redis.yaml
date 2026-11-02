@@ -1,5 +1,5 @@
-- name : Configure radis Server
-  hosts: radis
+- name : Configure redis Server
+  hosts: redis
   become: yes
 
   tasks:
