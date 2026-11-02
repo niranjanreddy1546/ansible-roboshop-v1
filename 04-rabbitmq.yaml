@@ -2,7 +2,7 @@
   hosts: rabbitmq
   become: yes
 
-  task:
+  tasks:
   - name: Copying rabbitmq repo content.
     ansible.builtin.copy:
       src: rabbitmq.repo
